@@ -2,14 +2,20 @@ package com.wamad.ecomerce.controller;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.wamad.ecomerce.dto.AuthenticationRequest;
+import com.wamad.ecomerce.dto.SignupRequest;
+import com.wamad.ecomerce.dto.UserDto;
 import com.wamad.ecomerce.entity.User;
 import com.wamad.ecomerce.repository.UserRepository;
+import com.wamad.ecomerce.services.auth.AuthService;
 import com.wamad.ecomerce.services.jwt.UserDetailsServiceImpl;
 import com.wamad.ecomerce.utils.JwtUtil;
+import jakarta.persistence.Entity;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -38,6 +44,8 @@ public class AuthController {
     private static final String TOKEN_PREFIX = "Bearer ";
     private static final String HEADER_STRING = "Authorization";
 
+    private final AuthService authService;
+
     @PostMapping("/authentication")
     public void createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) throws IOException, JSONException {
         try {
@@ -60,5 +68,15 @@ public class AuthController {
 
         }
 
+    }
+
+    @PostMapping("sign-up")
+    public ResponseEntity<?> signupUser(@RequestBody SignupRequest signupRequest){
+        if (authService.hasUserWithEmail(signupRequest.getEmail())){
+            return new ResponseEntity<>("User already exists", HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        UserDto userDto = authService.creatUser(signupRequest);
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 }
