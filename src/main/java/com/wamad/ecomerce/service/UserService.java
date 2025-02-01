@@ -1,5 +1,6 @@
 package com.wamad.ecomerce.service;
 
+import com.wamad.ecomerce.api.model.LoginBody;
 import com.wamad.ecomerce.api.model.RegistrationBody;
 import com.wamad.ecomerce.exception.UserAlreadyExistException;
 import com.wamad.ecomerce.model.User;
@@ -7,12 +8,15 @@ import com.wamad.ecomerce.model.dao.UserDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserDAO userDAO;
     private final EncryptionService encryptionService;
+    private final JWTService jwtService;
 
     public User registerUser(RegistrationBody registrationBody) throws UserAlreadyExistException{
         if(userDAO.findByEmail(registrationBody.getEmail()).isPresent() || userDAO.findByUsername(registrationBody.getUsername()).isPresent()){
@@ -27,5 +31,19 @@ public class UserService {
         String encryptedPassword = encryptionService.encryptPassword(registrationBody.getPassword());
         user.setPassword(encryptedPassword);
         return userDAO.save(user);
+    }
+
+    public String loginUser(LoginBody loginBody){
+        Optional<User> userOptional = userDAO.findByEmail(loginBody.getEmail());
+        if(userOptional.isEmpty()){
+            userOptional = userDAO.findByUsername(loginBody.getUsername());
+        }
+        if(userOptional.isPresent()){
+            User user = userOptional.get();
+            if(encryptionService.checkPassword(loginBody.getPassword(), user.getPassword())){
+                return jwtService.generateJWT(user);
+            }
+        }
+        return null;
     }
 }
