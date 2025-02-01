@@ -25,6 +25,7 @@ public class Product {
     @Column(name = "price", nullable = false)
     private Double price;
 
-
+    @OneToOne(mappedBy = "product", cascade = CascadeType.REMOVE, optional = false, orphanRemoval = true)
+    private Inventory inventory;
 
 }
