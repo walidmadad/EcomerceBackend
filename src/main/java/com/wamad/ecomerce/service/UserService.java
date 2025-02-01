@@ -13,7 +13,10 @@ public class UserService {
 
     private final UserDAO userDAO;
 
-    public User registerUser(RegistrationBody registrationBody) {
+    public User registerUser(RegistrationBody registrationBody) throws UserAlreadyExistException{
+        if(userDAO.findByEmail(registrationBody.getEmail()).isPresent() || userDAO.findByUsername(registrationBody.getUsername()).isPresent()){
+            throw new UserAlreadyExistException();
+        }
         User user = new User();
         user.setUsername(registrationBody.getUsername());
         user.setEmail(registrationBody.getEmail());
