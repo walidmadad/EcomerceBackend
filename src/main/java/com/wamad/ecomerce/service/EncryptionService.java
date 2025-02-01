@@ -21,5 +21,8 @@ public class EncryptionService {
     public String encryptPassword(String password) {
         return BCrypt.hashpw(password, salt);
     }
-    
+
+    public boolean checkPassword(String password, String hashedPassword) {
+        return BCrypt.checkpw(password, hashedPassword);
+    }
 }
