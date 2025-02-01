@@ -1,4 +1,4 @@
-package com.wamad.ecomerce.entity;
+package com.wamad.ecomerce.model;
 
 import com.wamad.ecomerce.enums.UserRole;
 import jakarta.persistence.*;
