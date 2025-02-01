@@ -4,11 +4,13 @@ import com.wamad.ecomerce.api.model.LoginBody;
 import com.wamad.ecomerce.api.model.LoginResponse;
 import com.wamad.ecomerce.api.model.RegistrationBody;
 import com.wamad.ecomerce.exception.UserAlreadyExistException;
+import com.wamad.ecomerce.model.User;
 import com.wamad.ecomerce.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,5 +40,10 @@ public class AuthenticationController {
             loginResponse.setJwt(jwt);
             return ResponseEntity.ok(loginResponse);
         }
+    }
+
+    @GetMapping("/me")
+    public User getLoggedInUserProfile(@AuthenticationPrincipal User user) {
+        return user;
     }
 }
