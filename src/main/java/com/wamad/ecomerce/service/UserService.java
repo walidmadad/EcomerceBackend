@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserDAO userDAO;
+    private final EncryptionService encryptionService;
 
     public User registerUser(RegistrationBody registrationBody) throws UserAlreadyExistException{
         if(userDAO.findByEmail(registrationBody.getEmail()).isPresent() || userDAO.findByUsername(registrationBody.getUsername()).isPresent()){
@@ -23,8 +24,8 @@ public class UserService {
         user.setFirstName(registrationBody.getFirstName());
         user.setLastName(registrationBody.getLastName());
 
-        // TODO: Encrypt password
-        user.setPassword(registrationBody.getPassword());
+        String encryptedPassword = encryptionService.encryptPassword(registrationBody.getPassword());
+        user.setPassword(encryptedPassword);
         return userDAO.save(user);
     }
 }
