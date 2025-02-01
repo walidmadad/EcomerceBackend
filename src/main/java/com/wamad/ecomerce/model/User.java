@@ -1,6 +1,5 @@
 package com.wamad.ecomerce.model;
 
-import com.wamad.ecomerce.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Data;
 
