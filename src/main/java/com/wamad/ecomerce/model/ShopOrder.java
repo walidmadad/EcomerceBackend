@@ -1,5 +1,6 @@
 package com.wamad.ecomerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -8,8 +9,8 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "order")
-public class Order {
+@Table(name = "shop_order")
+public class ShopOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -23,6 +24,7 @@ public class Order {
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<OrderQuantities> quantities = new ArrayList<>();
 }
