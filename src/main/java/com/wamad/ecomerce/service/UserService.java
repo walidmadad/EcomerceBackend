@@ -9,6 +9,7 @@ import com.wamad.ecomerce.model.User;
 import com.wamad.ecomerce.model.VerificationToken;
 import com.wamad.ecomerce.model.dao.UserDAO;
 import com.wamad.ecomerce.model.dao.VerificationTokenDAO;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -76,5 +77,21 @@ public class UserService {
             }
         }
         return null;
+    }
+
+    @Transactional
+    public boolean verifyUser(String token){
+        Optional<VerificationToken> opToken = verificationTokenDAO.findByToken(token);
+        if (opToken.isPresent()){
+            VerificationToken verificationToken = opToken.get();
+            User user = verificationToken.getUser();
+            if(!user.isEmailVerified()){
+                user.setEmailVerified(true);
+                userDAO.save(user);
+                verificationTokenDAO.deleteByUser(user);
+                return true;
+            }
+        }
+        return false;
     }
 }
