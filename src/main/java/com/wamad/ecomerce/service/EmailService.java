@@ -1,5 +1,6 @@
 package com.wamad.ecomerce.service;
 
+import com.wamad.ecomerce.exception.EmailFaiureException;
 import com.wamad.ecomerce.model.VerificationToken;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class EmailService {
         return simpleMailMessage;
     }
 
-    public void sendVerificationEmail(VerificationToken verificationToken){
+    public void sendVerificationEmail(VerificationToken verificationToken) throws EmailFaiureException, EmailFaiureException {
         SimpleMailMessage simpleMailMessage = makeMailMessage();
         simpleMailMessage.setTo(verificationToken.getUser().getEmail());
         simpleMailMessage.setSubject("Verify Your Email");
@@ -34,7 +35,7 @@ public class EmailService {
         try{
             javaMailSender.send(simpleMailMessage);
         }catch (MailException e){
-            System.out.println(e);
+            throw new EmailFaiureException();
         }
 
     }
