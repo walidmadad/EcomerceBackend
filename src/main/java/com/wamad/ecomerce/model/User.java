@@ -38,6 +38,10 @@ public class User {
     private List<Address> addresses = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id desc")
     private List<VerificationToken> verficationTokens = new ArrayList<>();
+
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
 
 }
