@@ -11,15 +11,16 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class EmailService {
 
-    @Value("${email.form}")
+    @Value("${email.from}")
     private String from;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     private SimpleMailMessage makeMailMessage(){
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
