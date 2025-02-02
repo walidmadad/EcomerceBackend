@@ -1,6 +1,7 @@
 package com.wamad.ecomerce.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,8 +21,9 @@ public class OrderQuantities {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    @JoinColumn(name = "shop_order_id", nullable = false)
+    private ShopOrder order;
 
 }
