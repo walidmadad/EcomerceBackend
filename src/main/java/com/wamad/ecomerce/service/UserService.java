@@ -28,7 +28,12 @@ public class UserService {
     private final VerificationTokenDAO verificationTokenDAO;
 
     public User registerUser(RegistrationBody registrationBody) throws UserAlreadyExistException, EmailFaiureException {
-        if(userDAO.findByEmail(registrationBody.getEmail()).isPresent() || userDAO.findByUsername(registrationBody.getUsername()).isPresent()){
+        if (userDAO.findByEmail(registrationBody.getEmail()).isPresent()) {
+            throw new UserAlreadyExistException();
+        }
+
+        // Check if the username already exists
+        if (userDAO.findByUsername(registrationBody.getUsername()).isPresent()) {
             throw new UserAlreadyExistException();
         }
         User user = new User();
