@@ -8,7 +8,6 @@ import com.wamad.ecomerce.api.model.RegistrationBody;
 import com.wamad.ecomerce.exception.EmailFaiureException;
 import com.wamad.ecomerce.exception.UserAlreadyExistException;
 import com.wamad.ecomerce.exception.UserNotVerifiedException;
-import com.wamad.ecomerce.model.User;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
@@ -34,17 +33,17 @@ public class UserServiceTest {
     public void testRegisterUser() throws MessagingException {
         RegistrationBody body = new RegistrationBody();
         body.setUsername("UserA");
-        body.setEmail("UserServiceTest$testRegisterUser@junit.com");
+        body.setEmail("UserServiceTest@.com");
         body.setFirstName("FirstName");
         body.setLastName("LastName");
-        body.setPassword("MySecretPassword123");
+        body.setPassword("MyPassword123");
         Assertions.assertThrows(UserAlreadyExistException.class,
                 () -> userService.registerUser(body), "Username should already be in use.");
-        body.setUsername("UserServiceTest$testRegisterUser");
-        body.setEmail("UserA@junit.com");
+        body.setUsername("UserServiceTest");
+        body.setEmail("UserA@test.com");
         Assertions.assertThrows(UserAlreadyExistException.class,
                 () -> userService.registerUser(body), "Email should already be in use.");
-        body.setEmail("UserServiceTest$testRegisterUser@junit.com");
+        body.setEmail("UserServiceTestr@test.com");
         Assertions.assertDoesNotThrow(() -> userService.registerUser(body),
                 "User should register successfully.");
         Assertions.assertEquals(body.getEmail(), greenMailExtension.getReceivedMessages()[0]
@@ -58,9 +57,38 @@ public class UserServiceTest {
         loginBody.setUsername("UserA11");
         loginBody.setPassword("PasswordA123");
         Assertions.assertNull(userService.loginUser(loginBody), "Username not exist.");
-        loginBody.setUsername("UserA");
-        loginBody.setPassword("PasswordA");
+
+        loginBody.setEmail("UserABB@test.com");
+        loginBody.setPassword("PasswordA123");
         Assertions.assertNull(userService.loginUser(loginBody), "Username not exist.");
+
+        loginBody.setUsername("UserA");
+        loginBody.setPassword("PasswordA123");
+        Assertions.assertNotNull(userService.loginUser(loginBody), "Login Successfully.");
+
+        loginBody.setUsername("UserAB");
+        loginBody.setEmail("UserA@test.com");
+        Assertions.assertNotNull(userService.loginUser(loginBody), "Login Successfully.");
+
+        loginBody.setUsername("UserB");
+        loginBody.setEmail("userB@test.com");
+        loginBody.setPassword("PasswordB123");
+
+        try{
+            userService.loginUser(loginBody);
+            Assertions.assertTrue(false, "Email not verified.");
+        }catch(UserNotVerifiedException ex){
+            Assertions.assertTrue(ex.isNewEmailSent(), "Email Verification should be sent.");
+            Assertions.assertEquals(1, greenMailExtension.getReceivedMessages().length);
+        }
+
+        try{
+            userService.loginUser(loginBody);
+            Assertions.assertTrue(false, "Email not verified.");
+        }catch(UserNotVerifiedException ex){
+            Assertions.assertFalse(ex.isNewEmailSent(), "Email Verification should not be sent.");
+            Assertions.assertEquals(1, greenMailExtension.getReceivedMessages().length);
+        }
 
     }
 
