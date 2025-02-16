@@ -8,6 +8,8 @@ import com.wamad.ecomerce.api.model.RegistrationBody;
 import com.wamad.ecomerce.exception.EmailFaiureException;
 import com.wamad.ecomerce.exception.UserAlreadyExistException;
 import com.wamad.ecomerce.exception.UserNotVerifiedException;
+import com.wamad.ecomerce.model.VerificationToken;
+import com.wamad.ecomerce.model.dao.VerificationTokenDAO;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
@@ -16,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 @SpringBootTest
 public class UserServiceTest {
@@ -27,6 +31,9 @@ public class UserServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private VerificationTokenDAO verificationTokenDAO;
 
     @Test
     @Transactional
@@ -90,6 +97,24 @@ public class UserServiceTest {
             Assertions.assertEquals(1, greenMailExtension.getReceivedMessages().length);
         }
 
+    }
+
+    @Test
+    @Transactional
+    public void testVerify() throws EmailFaiureException{
+        Assertions.assertFalse(userService.verifyUser("Bad Token"), "Token not exist.");
+        LoginBody loginBody = new LoginBody();
+        loginBody.setUsername("UserB");
+        loginBody.setPassword("PasswordB123");
+        try{
+            userService.loginUser(loginBody);
+            Assertions.assertTrue(false, "Email not verified.");
+        }catch(UserNotVerifiedException ex){
+            List<VerificationToken> tokens = verificationTokenDAO.findByUser_IdOrderByIdDesc(2L);
+            String token = tokens.get(0).getToken();
+            Assertions.assertTrue(userService.verifyUser(token), "Token should be valid");
+            Assertions.assertNotNull(loginBody,"The user should be verified now ");
+        }
     }
 
 }
