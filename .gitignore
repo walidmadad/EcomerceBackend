@@ -34,4 +34,4 @@ build/
 
 ### Configurations ###
 src/main/resources/application.properties
-src/test/resources/config/
+src/test/resources/config/**
